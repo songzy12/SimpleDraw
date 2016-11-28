@@ -1,12 +1,12 @@
 #include "stdafx.h"
 #include "Gliph.h"
+#include <fstream>
 
 Gliph::Gliph(int type, CPoint point1, CPoint point2)
 {
 	this->m_type = type;
 	this->start = point1;
-	this->end = point2;
-	
+	this->end = point2;	
 }
 
 Gliph::~Gliph()
@@ -23,7 +23,7 @@ void Gliph::drawmyself(CDC* pDC)
 }
 bool Gliph::hitTest(CPoint pt)
 {
-	if (m_BoundingBox.PtInRect(pt) == true)
+	/*if (m_BoundingBox.PtInRect(pt) == true)
 	{
 		m_bSelectedFlag = true;
 		return m_bSelectedFlag;
@@ -32,10 +32,14 @@ bool Gliph::hitTest(CPoint pt)
 	{
 		m_bSelectedFlag = false;
 		return m_bSelectedFlag;
-	}
-	/*
-	return m_bSelectedFlag = (m_BoundingBox.PtInRect(pt) == true);
-	*/
+	}*/
+	std::ofstream log;
+	log.open("log.txt", std::ofstream::out | std::ofstream::app);
+	log << "m_BoundingBox: " << m_BoundingBox.TopLeft().x << ", " << m_BoundingBox.TopLeft().y;
+	log << " " << m_BoundingBox.BottomRight().x << ", " << m_BoundingBox.BottomRight().y << std::endl;
+	log.close();
+	return m_bSelectedFlag = m_BoundingBox.PtInRect(pt);
+	
 }
 void Gliph::moveByOffset(float Xoffset, float yOffset)
 {
