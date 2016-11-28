@@ -1,0 +1,13 @@
+Debug/
+Release/
+urlmon.pdb/
+res/
+*.txt
+*.rc
+*.plg
+*.dsp
+*.clw
+*.aps
+*.vcproj
+*.vcxproj
+*.vcxproj.filters
