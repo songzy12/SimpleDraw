@@ -24,11 +24,10 @@ protected:
 	CSimpleDrawDoc* m_pDoc;
 	
 	Gliph* pCurGliph;
-	Gliph* newGliph;
 	CPoint m_ptStart,m_ptPrev,m_ptEnd;
-	CPoint mousepointS, mousepointP, mousepointE;//用于select模式下记录鼠标坐标的
+	CPoint mousepointS, mousepointE;
 	int flag;//用于判断是移动(0)还是均匀缩放(1)还是非均匀缩放(2),
-	int symb;//用于记录Glif数组当前选中的gliph的index
+	int symb;//用于记录Glif数组当前选中的glif的index
 	int x1 = m_ptStart.x;
 	int y1 = m_ptStart.y;
 	int x2 = m_ptEnd.x;
@@ -38,7 +37,7 @@ protected:
 	int i;
 	int Xoffset = mousepointE.x - mousepointS.x;
 	int Yoffset = mousepointE.y - mousepointS.y;
-	CPoint offset,prevoffset; // = mousepointE-mousepointS;???这样的offset不会更新？？
+	CPoint offset = mousepointE-mousepointS;
 	STATE m_mode;
 public:
 	void setDC(CDC * pDC){m_pDC = pDC;}
@@ -52,6 +51,5 @@ public:
 	void OnLButtonUp(UINT nFlags, CPoint point);
 	void OnMouseMove(UINT nFlags, CPoint point);
 	void showHandle(Gliph* ptGliph);
-	void showBoundingBox(Gliph* ptGliph);
 
 };
