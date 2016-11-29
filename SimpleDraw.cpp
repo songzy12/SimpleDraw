@@ -50,7 +50,6 @@ BOOL CSimpleDrawApp::InitInstance()
 	
 	std::ofstream log;
 	log.open("log.txt", std::ofstream::out);
-	log << "buttonUp" << std::endl;
 	log.close();
 
 	InitCommonControls();

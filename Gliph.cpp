@@ -33,11 +33,11 @@ bool Gliph::hitTest(CPoint pt)
 		m_bSelectedFlag = false;
 		return m_bSelectedFlag;
 	}*/
-	std::ofstream log;
+	/*std::ofstream log;
 	log.open("log.txt", std::ofstream::out | std::ofstream::app);
 	log << "m_BoundingBox: " << m_BoundingBox.TopLeft().x << ", " << m_BoundingBox.TopLeft().y;
 	log << " " << m_BoundingBox.BottomRight().x << ", " << m_BoundingBox.BottomRight().y << std::endl;
-	log.close();
+	log.close();*/
 	return m_bSelectedFlag = m_BoundingBox.PtInRect(pt);
 	
 }
@@ -71,8 +71,8 @@ void Gliph::setSelectedFlag(bool flag)
 
 	if (type == 0)
 	{
-		handlelist[0] = new CRect(pt1.x - 5, pt1.y + 5, pt1.x + 5, pt1.y - 5);
-		handlelist[1] = new CRect(pt2.x - 5, pt2.y + 5, pt2.x + 5, pt2.y - 5);
+		handlelist[0] = new CRect(pt1.x - 5, pt1.y - 5, pt1.x + 5, pt1.y + 5);
+		handlelist[1] = new CRect(pt2.x - 5, pt2.y - 5, pt2.x + 5, pt2.y + 5);
 	}
 	else
 	{
@@ -100,6 +100,13 @@ int Gliph::hitHandleTest(CPoint pt)
 	int j,flag;
 	for (j = 0; j < 8; j++)
 	{
+		/*std::ofstream log;
+		log.open("log.txt", std::ofstream::out | std::ofstream::app);
+		log << "handleList " << j <<": " << handleList[j].TopLeft().x << ", " << handleList[j].TopLeft().y;
+		log << " " << handleList[j].BottomRight().x << ", " << handleList[j].BottomRight().y << std::endl;
+		log << "point: " << pt.x << ", " << pt.y << std::endl;
+		log.close();*/
+
 		if (this->handleList[j].PtInRect(pt) == true)
 		{
 			flag = j;

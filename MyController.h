@@ -40,6 +40,7 @@ protected:
 	int Yoffset = mousepointE.y - mousepointS.y;
 	CPoint offset,prevoffset; // = mousepointE-mousepointS;???这样的offset不会更新？？
 	STATE m_mode;
+	int a;
 public:
 	void setDC(CDC * pDC){m_pDC = pDC;}
 	CDC * getDC(){return m_pDC;}
