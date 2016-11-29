@@ -8,6 +8,8 @@
 #include "SimpleDrawDoc.h"
 #include "SimpleDrawView.h"
 
+#include <fstream>
+
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
@@ -45,6 +47,12 @@ BOOL CSimpleDrawApp::InitInstance()
 	// 如果一个运行在 Windows XP 上的应用程序清单指定要
 	// 使用 ComCtl32.dll 版本 6 或更高版本来启用可视化方式，
 	//则需要 InitCommonControls()。否则，将无法创建窗口。
+	
+	std::ofstream log;
+	log.open("log.txt", std::ofstream::out);
+	log << "buttonUp" << std::endl;
+	log.close();
+
 	InitCommonControls();
 
 	CWinApp::InitInstance();

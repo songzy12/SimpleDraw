@@ -1,15 +1,21 @@
 #include "StdAfx.h"
 #include ".\mycontroller.h"
+#include <fstream>
 
 MyController::MyController(void)
 {
 	m_mode = DRAW_SELECT;
+	flag = -1;
+	symb = -1;
+	newGliph = nullptr;
 }
 MyController::MyController(CDC * pDC, CSimpleDrawDoc* pDoc)
 {
 	this->m_pDC = pDC;
 	this->m_pDoc = pDoc;
-
+	flag = -1;
+	symb = -1;
+	newGliph = nullptr;
 }
 MyController::~MyController(void)
 {
@@ -22,11 +28,18 @@ void MyController::showHandle(Gliph* ptgliph)
 	{
 		this->m_pDC->Rectangle(ptgliph->handleList[symb]);
 	}
+}
+
+void MyController::hideHandle(Gliph* ptgliph) {
 
 }
+
 void MyController::showBoundingBox(Gliph* ptGliph)
 {
 	this->m_pDC->Rectangle(ptGliph->m_BoundingBox);
+}
+
+void MyController::hideBoundingBox(Gliph* ptGliph) {
 
 }
 
@@ -34,9 +47,6 @@ void MyController::OnLButtonDown(UINT nFlags, CPoint point)
 {
 	this->m_ptStart = point;
 	this->m_ptPrev = point;
-
-
-
 	
 	switch (m_mode)
 	{
@@ -49,9 +59,6 @@ void MyController::OnLButtonDown(UINT nFlags, CPoint point)
 		pCurGliph->setBoundingBox();
 		pCurGliph->CreateHandleList(this->m_ptStart, point, 0);
 		showHandle(pCurGliph);
-
-
-
 	}
 	break;
 	case MyController::DRAW_Rectangle:
@@ -75,7 +82,6 @@ void MyController::OnLButtonDown(UINT nFlags, CPoint point)
 		pCurGliph->CreateHandleList(this->m_ptStart, point, 2);
 		
 		showHandle(pCurGliph);
-		showHandle(pCurGliph);
 	}
 	break;
 	case MyController::DRAW_Ellipse:
@@ -94,7 +100,12 @@ void MyController::OnLButtonDown(UINT nFlags, CPoint point)
 		mousepointS = point;
 		mousepointP = point;
 		m_pDC->SelectStockObject(NULL_BRUSH);
-		
+
+		std::ofstream log;
+		log.open("log.txt", std::ofstream::out | std::ofstream::app);
+		log << "count: " << m_pDoc->m_GliphList.GetCount() << std::endl;
+		log.close();
+
 		int i;
 		int j = m_pDoc->m_GliphList.GetCount();
 		for (i = 0; i < j; i++)
@@ -109,13 +120,11 @@ void MyController::OnLButtonDown(UINT nFlags, CPoint point)
 				//击中消除handle
 				if (pCurGliph->hitHandleTest(point) != -1)
 				{
-					this->flag = 1;//缩放
-					
+					this->flag = 1;//缩放					
 				}
 				else
 				{
 					this->flag = 0;//移动
-
 				}
 			}
 
@@ -166,24 +175,57 @@ void MyController::OnLButtonUp(UINT nFlags, CPoint point)
 	}
 	case DRAW_SELECT:
 	{
+		std::ofstream log;
+		log.open("log.txt", std::ofstream::out | std::ofstream::app);
+		log << "buttonUp" << std::endl;
+		log.close();
+		if (flag == -1)
+			break;
+
 		mousepointE = point;
-		
 		//m_pDoc->addGliph(newGliph);
-		newGliph->addpoint(point);
-		newGliph->setBoundingBox();
+		prevoffset = point - point;
+		flag = -1;
+
+		/*if (newGliph == nullptr) {
+			break;
+		}*/
+		m_pDC->SelectStockObject(NULL_BRUSH);
 		
 		if (pCurGliph->getType() == 0)
 		{
+			//m_pDC->MoveTo(pCurGliph->getSpt());
+			//m_pDC->LineTo(pCurGliph->getEpt());
+
+			std::ofstream log;
+			log.open("log.txt", std::ofstream::out | std::ofstream::app);
+
+			//在原来链表位置处设置新图像,以及显示出handle
+			newGliph = new Gliph(0, pCurGliph->getSpt() + this->offset, pCurGliph->getEpt() + this->offset);
+			log << "before delGlighAt: " << symb << ", " << m_pDoc->m_GliphList.GetCount() << std::endl;
+			m_pDoc->delGliphAt(symb);
+			log << "after delGlighAt: " << symb << ", " << m_pDoc->m_GliphList.GetCount() << std::endl;
+			m_pDoc->addGliph(newGliph);
+			//m_pDoc->upadateGliph(pCurGliph, newGliph);
+
+			log.close();
+
+			newGliph->setBoundingBox();
 			//showBoundingBox(newGliph);
 			newGliph->CreateHandleList(newGliph->getSpt(), newGliph->getEpt(), 0);
 			showHandle(newGliph);
-			showHandle(newGliph);
+
+			log.open("log.txt", std::ofstream::out | std::ofstream::app);
+			log << "curGliph: " << pCurGliph->getSpt().x << ", " << pCurGliph->getSpt().y;
+			log << " " << pCurGliph->getEpt().x << ", " << pCurGliph->getEpt().y << std::endl;
+			log << "newGliph: " << newGliph->getSpt().x << ", " << newGliph->getSpt().y;
+			log << " " << newGliph->getEpt().x << ", " << newGliph->getEpt().y << std::endl;
+			log.close();
 		}
 		if (pCurGliph->getType() == 1)
 		{
 			//showBoundingBox(newGliph);
 			newGliph->CreateHandleList(newGliph->getSpt(), newGliph->getEpt(), 1);
-			showHandle(newGliph);
 			showHandle(newGliph);
 		}
 		if (pCurGliph->getType() == 2)
@@ -191,18 +233,16 @@ void MyController::OnLButtonUp(UINT nFlags, CPoint point)
 			//showBoundingBox(newGliph);
 			newGliph->CreateHandleList(newGliph->getSpt(), newGliph->getEpt(), 2);
 			showHandle(newGliph);
-			showHandle(newGliph);
 		}
 		if (pCurGliph->getType() == 3)
 		{
 			//showBoundingBox(newGliph);
 			newGliph->CreateHandleList(newGliph->getSpt(), newGliph->getEpt(), 3);
 			showHandle(newGliph);
-			showHandle(newGliph);
 		}
-
 		
-
+		/*newGliph = nullptr; */
+		symb = -1;
 
 	}
 	break;
@@ -284,8 +324,7 @@ void MyController::OnMouseMove(UINT nFlags, CPoint point)
 	{
 		mousepointE = point;
 		m_pDC->SelectStockObject(NULL_BRUSH);
-		this->offset = mousepointE - mousepointS;//更新offset
-		
+		this->offset = mousepointE - mousepointS;//更新offset		
 		
 		if (this->flag == 0)//move要擦除两次，一次是擦除已经建立好的图元，第二次是擦除移动过程中创建的图元
 		{
@@ -305,29 +344,14 @@ void MyController::OnMouseMove(UINT nFlags, CPoint point)
 				mousepointP = point;
 				this->prevoffset = mousepointP - mousepointS;
 				
-				//绘制新图像
+				/*//绘制新图像
 				m_pDC->MoveTo(pCurGliph->getSpt() + this->offset);
 				m_pDC->LineTo(pCurGliph->getEpt() + this->offset);
 
 				m_pDC->MoveTo(pCurGliph->getSpt() + this->offset);
-				m_pDC->LineTo(pCurGliph->getEpt() + this->offset);
-				
-				//在原来链表位置处设置新图像,以及显示出handle
-				newGliph = new Gliph(0,pCurGliph->getSpt() + this->offset, pCurGliph->getEpt() + this->offset);
-				m_pDoc->delGliphAt(symb);
-				m_pDoc->addGliph(newGliph);
-				//m_pDoc->upadateGliph(pCurGliph, newGliph);
-				
-				newGliph->addpoint(point);
-				
-				newGliph->setBoundingBox();
-				//showBoundingBox(newGliph);
-				newGliph->CreateHandleList(newGliph->getSpt(), newGliph->getEpt(), 0);
-				showHandle(newGliph);
-				showHandle(newGliph);
-				
-
+				m_pDC->LineTo(pCurGliph->getEpt() + this->offset);*/
 			}
+
 			if (pCurGliph->getType() == 1)//矩形
 			{
 				
@@ -349,8 +373,6 @@ void MyController::OnMouseMove(UINT nFlags, CPoint point)
 				m_pDoc->delGliphAt(symb);
 				//m_pDoc->upadateGliph(pCurGliph, newGliph);
 				m_pDoc->addGliph(newGliph);
-
-				newGliph->addpoint(point);
 
 				newGliph->setBoundingBox();
 				//showBoundingBox(newGliph);
@@ -379,8 +401,7 @@ void MyController::OnMouseMove(UINT nFlags, CPoint point)
 				m_pDoc->delGliphAt(symb);
 				//m_pDoc->upadateGliph(pCurGliph, newGliph);
 				m_pDoc->addGliph(newGliph);
-				newGliph->addpoint(point);
-
+				
 				newGliph->setBoundingBox();
 				//showBoundingBox(newGliph);
 				newGliph->CreateHandleList(newGliph->getSpt(), newGliph->getEpt(), 2);
@@ -406,8 +427,7 @@ void MyController::OnMouseMove(UINT nFlags, CPoint point)
 				m_pDoc->delGliphAt(symb);
 				//m_pDoc->upadateGliph(pCurGliph, newGliph);
 				m_pDoc->addGliph(newGliph);
-				newGliph->addpoint(point);
-
+				
 				newGliph->setBoundingBox();
 				//showBoundingBox(newGliph);
 				newGliph->CreateHandleList(newGliph->getSpt(), newGliph->getEpt(), 3);
