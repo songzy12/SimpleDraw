@@ -31,7 +31,9 @@ void MyController::showHandle(Gliph* ptgliph)
 }
 
 void MyController::hideHandle(Gliph* ptgliph) {
-
+	m_pDC->SetROP2(R2_NOT);
+	m_pDC->SelectStockObject(NULL_BRUSH);
+	showHandle(ptgliph);
 }
 
 void MyController::showBoundingBox(Gliph* ptGliph)
@@ -40,7 +42,9 @@ void MyController::showBoundingBox(Gliph* ptGliph)
 }
 
 void MyController::hideBoundingBox(Gliph* ptGliph) {
-
+	m_pDC->SetROP2(R2_NOT);
+	m_pDC->SelectStockObject(NULL_BRUSH);
+	showBoundingBox(ptGliph);
 }
 
 void MyController::OnLButtonDown(UINT nFlags, CPoint point)
@@ -101,7 +105,6 @@ void MyController::OnLButtonDown(UINT nFlags, CPoint point)
 			break;
 		mousepointS = point;
 		mousepointP = point;
-		m_pDC->SelectStockObject(NULL_BRUSH);
 
 		int i;
 		int j = m_pDoc->m_GliphList.GetCount();
@@ -196,9 +199,10 @@ void MyController::OnLButtonUp(UINT nFlags, CPoint point)
 		/*if (newGliph == nullptr) {
 			break;
 		}*/
-		m_pDC->SelectStockObject(NULL_BRUSH);
 		
 		if (flag == 0) {
+			this->hideBoundingBox(pCurGliph);
+			this->hideHandle(pCurGliph);
 			if (pCurGliph->getType() == 0)
 			{
 				//m_pDC->MoveTo(pCurGliph->getSpt());
