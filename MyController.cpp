@@ -21,6 +21,11 @@ MyController::~MyController(void)
 {
 }
 
+void MyController::showSelf(Gliph* ptGliph)
+{
+	ptGliph->drawSelf(m_pDC);
+}
+
 void MyController::showHandle(Gliph* ptgliph)
 {
 	int symb;
@@ -52,57 +57,20 @@ void MyController::OnLButtonDown(UINT nFlags, CPoint point)
 	this->m_ptStart = point;
 	this->m_ptPrev = point;
 	
-	switch (m_mode)
+	if (m_mode != MyController::DRAW_SELECT)
 	{
-	case MyController::DRAW_LINE:
-	{
-		pCurGliph = new Gliph(0, point, point);
+		pCurGliph = new Gliph(m_mode, point, point);
 		m_pDoc->addGliph(pCurGliph);
 
 		pCurGliph->addpoint(point);
 		pCurGliph->setBoundingBox();
-		pCurGliph->CreateHandleList(this->m_ptStart, point, 0);
+		pCurGliph->CreateHandleList(this->m_ptStart, point, m_mode);
 		showHandle(pCurGliph);
 	}
-	break;
-	case MyController::DRAW_Rectangle:
-	{
-		pCurGliph = new Gliph(1, point, point);
-		m_pDoc->addGliph(pCurGliph);
-
-		pCurGliph->addpoint(point);
-		pCurGliph->setBoundingBox();
-		pCurGliph->CreateHandleList(this->m_ptStart, point, 1);
-		showHandle(pCurGliph);
-	}
-	break;
-	case MyController::DRAW_RoundRect:
-	{
-		pCurGliph = new Gliph(2, point, point);
-		m_pDoc->addGliph(pCurGliph);
-
-		pCurGliph->addpoint(point);
-		pCurGliph->setBoundingBox();
-		pCurGliph->CreateHandleList(this->m_ptStart, point, 2);
-		
-		showHandle(pCurGliph);
-	}
-	break;
-	case MyController::DRAW_Ellipse:
-	{
-		pCurGliph = new Gliph(3, point, point);
-		m_pDoc->addGliph(pCurGliph);
-
-		pCurGliph->addpoint(point);
-		pCurGliph->setBoundingBox();
-		pCurGliph->CreateHandleList(this->m_ptStart, point, 3);
-		showHandle(pCurGliph);
-	}
-	break;
-	case MyController::DRAW_SELECT:
+	else
 	{
 		if (this->flag != -1)
-			break;
+			return;
 		mousepointS = point;
 		mousepointP = point;
 
@@ -117,7 +85,7 @@ void MyController::OnLButtonDown(UINT nFlags, CPoint point)
 			log << "buttonDown, hitHandleTest: " << i << ": " << pCurGliph->hitHandleTest(point) << std::endl;
 			log.close();
 
-			
+
 			if (pCurGliph->hitHandleTest(point) != -1)
 			{
 				a = pCurGliph->hitHandleTest(point);
@@ -131,66 +99,36 @@ void MyController::OnLButtonDown(UINT nFlags, CPoint point)
 				this->symb = i;
 				break;
 			}
-			else if (m_pDoc->getGliphAt(i)->hitTest(point) == true)
-			{	
+			else if (m_pDoc->getGliphAt(i)->hitTest(point))
+			{
 				this->flag = 0;//移动		
 				this->showBoundingBox(pCurGliph);//击中就显示boundingbox
 				break;
 			}
 
 		}
-	}break;
-	default:
-		break;
 	}
 }
+
 void MyController::OnLButtonUp(UINT nFlags, CPoint point)
 {
 	this->m_ptEnd = point;
 	
-	switch (m_mode)
-	{
-	case DRAW_LINE:
+	if (m_mode != DRAW_SELECT)
 	{
 		pCurGliph->addpoint(point);
 		pCurGliph->setBoundingBox();
-		pCurGliph->CreateHandleList(this->m_ptStart, point, 0);
-		showHandle(pCurGliph);
-
-
-	}
-	break;
-	case DRAW_Rectangle:
-	{
-		pCurGliph->addpoint(point);
-		pCurGliph->setBoundingBox();
-		pCurGliph->CreateHandleList(this->m_ptStart, point, 1);
+		pCurGliph->CreateHandleList(this->m_ptStart, point, m_mode);
 		showHandle(pCurGliph);
 	}
-	break;
-	case DRAW_RoundRect:
-	{
-		pCurGliph->addpoint(point);
-		pCurGliph->setBoundingBox();
-		pCurGliph->CreateHandleList(this->m_ptStart, point, 2);
-		showHandle(pCurGliph);
-	}
-	break;
-	case DRAW_Ellipse:
-	{
-		pCurGliph->addpoint(point);
-		pCurGliph->setBoundingBox();
-		pCurGliph->CreateHandleList(this->m_ptStart, point, 3);
-		showHandle(pCurGliph);
-	}
-	case DRAW_SELECT:
+	else
 	{
 		std::ofstream log;
 		log.open("log.txt", std::ofstream::out | std::ofstream::app);
 		log << "buttonUp" << std::endl;
 		log.close();
 		if (flag == -1)
-			break;
+			return;
 
 		mousepointE = point;
 		//m_pDoc->addGliph(newGliph);
@@ -271,82 +209,24 @@ void MyController::OnLButtonUp(UINT nFlags, CPoint point)
 		flag = -1;
 
 	}
-	break;
-	}
 }
 void MyController::OnMouseMove(UINT nFlags, CPoint point)
-{
+{	
 	m_pDC->SetROP2(R2_NOT);
-	switch (m_mode) {
-	case DRAW_LINE:
-		if (nFlags & MK_LBUTTON) 
-		{
-			m_pDC->MoveTo(this->m_ptStart);
-			m_pDC->LineTo(this->m_ptPrev);
-			m_pDC->MoveTo(this->m_ptStart);
-			m_pDC->LineTo(point);
-			m_ptPrev = point;
-
-			pCurGliph->addpoint(point);
-			pCurGliph->setBoundingBox();
-			pCurGliph->CreateHandleList(this->m_ptStart, point, 0);
-			showHandle(pCurGliph);
-			showHandle(pCurGliph);
-
-		}
-		break;
-	case DRAW_Rectangle:
-	{
+	if (m_mode != DRAW_SELECT) {
 		m_pDC->SelectStockObject(NULL_BRUSH);
-		if (nFlags & MK_LBUTTON)
-		{
-			m_pDC->Rectangle(CRect(m_ptStart, m_ptPrev));
-			m_pDC->Rectangle(CRect(m_ptStart, point));
-			m_ptPrev = point;
-
+		if (nFlags & MK_LBUTTON) {
+			showSelf(pCurGliph);
+			hideHandle(pCurGliph);
 			pCurGliph->addpoint(point);
+			showSelf(pCurGliph);
+			showHandle(pCurGliph);
+
 			pCurGliph->setBoundingBox();
 			pCurGliph->CreateHandleList(this->m_ptStart, point, 1);
-			showHandle(pCurGliph);
-			showHandle(pCurGliph);
 		}
 	}
-	break;
-	case DRAW_RoundRect:
-	{
-		m_pDC->SelectStockObject(NULL_BRUSH);
-		if (nFlags & MK_LBUTTON)
-		{
-			m_pDC->RoundRect(CRect(m_ptStart, m_ptPrev), CPoint(30, 30));
-			m_pDC->RoundRect(CRect(m_ptStart, point), CPoint(30, 30));
-			m_ptPrev = point;
-
-			pCurGliph->addpoint(point);
-			pCurGliph->setBoundingBox();
-			pCurGliph->CreateHandleList(this->m_ptStart, point, 2);
-			showHandle(pCurGliph);
-			showHandle(pCurGliph);
-		}
-	}
-	break;
-	case DRAW_Ellipse:
-	{
-		m_pDC->SelectStockObject(NULL_BRUSH);
-		if (nFlags & MK_LBUTTON)
-		{
-			m_pDC->Ellipse(CRect(m_ptStart, m_ptPrev));
-			m_pDC->Ellipse(CRect(m_ptStart, point));
-			m_ptPrev = point;
-
-			pCurGliph->addpoint(point);
-			pCurGliph->setBoundingBox();
-			pCurGliph->CreateHandleList(this->m_ptStart, point, 3);
-			showHandle(pCurGliph);
-			showHandle(pCurGliph);
-		}
-	}
-	break;
-	case DRAW_SELECT:
+	else
 	{
 		mousepointE = point;
 		m_pDC->SelectStockObject(NULL_BRUSH);
@@ -647,5 +527,4 @@ void MyController::OnMouseMove(UINT nFlags, CPoint point)
 		
 	}
 	this->m_ptEnd = point;
-	}
 }

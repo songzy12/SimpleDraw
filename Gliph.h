@@ -26,7 +26,7 @@ protected:
 	COLORREF m_color;
 	bool m_bSelectedFlag;
 	bool m_bSHandleFlag;
-	
+
 
 
 
@@ -40,7 +40,7 @@ public:
 
 	void setBoundingBox();
 	void CreateHandleList(CPoint pt1, CPoint pt2, int type);
-	virtual void drawmyself(CDC* pDC);
+	void drawSelf(CDC* pDC);
 	void Drawboundingbox(CDC* pdc);
 	void addpoint(CPoint point);
 	int getType() { return this->m_type; }

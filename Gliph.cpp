@@ -15,31 +15,28 @@ Gliph::~Gliph()
 void Gliph::setBoundingBox()
 {
 	this->m_BoundingBox = new CRect(this->start, this->end);
-
 }
-void Gliph::drawmyself(CDC* pDC)
+void Gliph::drawSelf(CDC* m_pDC)
 {
-
+	switch (m_type) {
+	case 0: 
+		m_pDC->MoveTo(this->start);
+		m_pDC->LineTo(this->end);
+		break;
+	case 1:
+		m_pDC->Rectangle(CRect(start, end));
+		break;
+	case 2:
+		m_pDC->RoundRect(CRect(start, end), CPoint(30, 30));
+		break;
+	case 3:
+		m_pDC->Ellipse(CRect(start, end));
+		break;
+	}
 }
 bool Gliph::hitTest(CPoint pt)
 {
-	/*if (m_BoundingBox.PtInRect(pt) == true)
-	{
-		m_bSelectedFlag = true;
-		return m_bSelectedFlag;
-	}
-	else
-	{
-		m_bSelectedFlag = false;
-		return m_bSelectedFlag;
-	}*/
-	/*std::ofstream log;
-	log.open("log.txt", std::ofstream::out | std::ofstream::app);
-	log << "m_BoundingBox: " << m_BoundingBox.TopLeft().x << ", " << m_BoundingBox.TopLeft().y;
-	log << " " << m_BoundingBox.BottomRight().x << ", " << m_BoundingBox.BottomRight().y << std::endl;
-	log.close();*/
-	return m_bSelectedFlag = m_BoundingBox.PtInRect(pt);
-	
+	return m_bSelectedFlag = m_BoundingBox.PtInRect(pt);	
 }
 void Gliph::moveByOffset(float Xoffset, float yOffset)
 {

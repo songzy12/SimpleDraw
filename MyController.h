@@ -52,6 +52,7 @@ public:
 	void OnLButtonDown(UINT nFlags, CPoint point);
 	void OnLButtonUp(UINT nFlags, CPoint point);
 	void OnMouseMove(UINT nFlags, CPoint point);
+	void showSelf(Gliph* ptGliph);
 	void showHandle(Gliph* ptGliph);
 	void hideHandle(Gliph* ptGliph);
 	void showBoundingBox(Gliph* ptGliph);
