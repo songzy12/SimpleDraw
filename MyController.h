@@ -24,6 +24,7 @@ protected:
 	CSimpleDrawDoc* m_pDoc;
 	
 	Gliph* pCurGliph;
+	Gliph* prevGliph;
 	Gliph* newGliph;
 	CPoint m_ptStart,m_ptPrev,m_ptEnd;
 	CPoint mousepointS, mousepointP, mousepointE;//用于select模式下记录鼠标坐标的

@@ -74,25 +74,24 @@ void MyController::OnLButtonDown(UINT nFlags, CPoint point)
 		mousepointS = point;
 		mousepointP = point;
 
-		int i;
-		int j = m_pDoc->m_GliphList.GetCount();
-		for (i = 0; i < j; i++)
+		int count = m_pDoc->m_GliphList.GetCount();
+
+		std::ofstream log;
+		log.open("log.txt", std::ofstream::out | std::ofstream::app);
+		log << "count: " << count << std::endl;
+		log.close();
+		
+		for (int i = 0; i < count; i++)
 		{
 			pCurGliph = m_pDoc->getGliphAt(i);
-
-			std::ofstream log;
-			log.open("log.txt", std::ofstream::out | std::ofstream::app);
-			log << "buttonDown, hitHandleTest: " << i << ": " << pCurGliph->hitHandleTest(point) << std::endl;
-			log.close();
-
-
+			
 			if (pCurGliph->hitHandleTest(point) != -1)
 			{
 				a = pCurGliph->hitHandleTest(point);
 
 				std::ofstream log;
 				log.open("log.txt", std::ofstream::out | std::ofstream::app);
-				log << "a: " << a << std::endl;
+				log << "handle hit: " << a << std::endl;
 				log.close();
 
 				this->flag = 1;//缩放
@@ -103,9 +102,9 @@ void MyController::OnLButtonDown(UINT nFlags, CPoint point)
 			{
 				this->flag = 0;//移动		
 				this->showBoundingBox(pCurGliph);//击中就显示boundingbox
+				this->symb = i;
 				break;
 			}
-
 		}
 	}
 }
@@ -131,65 +130,34 @@ void MyController::OnLButtonUp(UINT nFlags, CPoint point)
 			return;
 
 		mousepointE = point;
-		//m_pDoc->addGliph(newGliph);
 		prevoffset = point - point;
 
-		/*if (newGliph == nullptr) {
-			break;
-		}*/
+		m_pDC->SetROP2(R2_NOT);
+		m_pDC->SelectStockObject(NULL_BRUSH);
 		
 		if (flag == 0) {
+			int type = pCurGliph->getType();
+			//擦除原本的图形
+			pCurGliph->drawSelf(m_pDC);
+
 			this->hideBoundingBox(pCurGliph);
 			this->hideHandle(pCurGliph);
-			if (pCurGliph->getType() == 0)
-			{
-				//m_pDC->MoveTo(pCurGliph->getSpt());
-				//m_pDC->LineTo(pCurGliph->getEpt());
+			
+			std::ofstream log;
+			log.open("log.txt", std::ofstream::out | std::ofstream::app);
 
-				//std::ofstream log;
-				//log.open("log.txt", std::ofstream::out | std::ofstream::app);
-
-				//在原来链表位置处设置新图像,以及显示出handle
-
-				newGliph = new Gliph(0, pCurGliph->getSpt() + this->offset, pCurGliph->getEpt() + this->offset);
-				//log << "before delGlighAt: " << symb << ", " << m_pDoc->m_GliphList.GetCount() << std::endl;
-				m_pDoc->delGliphAt(symb);
-				//log << "after delGlighAt: " << symb << ", " << m_pDoc->m_GliphList.GetCount() << std::endl;
-				m_pDoc->addGliph(newGliph);
-				//m_pDoc->upadateGliph(pCurGliph, newGliph);
-
-				//log.close();
-
-				newGliph->setBoundingBox();
-				//showBoundingBox(newGliph);
-				newGliph->CreateHandleList(newGliph->getSpt(), newGliph->getEpt(), 0);
-				showHandle(newGliph);
-
-				/*log.open("log.txt", std::ofstream::out | std::ofstream::app);
-				log << "curGliph: " << pCurGliph->getSpt().x << ", " << pCurGliph->getSpt().y;
-				log << " " << pCurGliph->getEpt().x << ", " << pCurGliph->getEpt().y << std::endl;
-				log << "newGliph: " << newGliph->getSpt().x << ", " << newGliph->getSpt().y;
-				log << " " << newGliph->getEpt().x << ", " << newGliph->getEpt().y << std::endl;
-				log.close();*/
-			}
-			if (pCurGliph->getType() == 1)
-			{
-				//showBoundingBox(newGliph);
-				newGliph->CreateHandleList(newGliph->getSpt(), newGliph->getEpt(), 1);
-				showHandle(newGliph);
-			}
-			if (pCurGliph->getType() == 2)
-			{
-				//showBoundingBox(newGliph);
-				newGliph->CreateHandleList(newGliph->getSpt(), newGliph->getEpt(), 2);
-				showHandle(newGliph);
-			}
-			if (pCurGliph->getType() == 3)
-			{
-				//showBoundingBox(newGliph);
-				newGliph->CreateHandleList(newGliph->getSpt(), newGliph->getEpt(), 3);
-				showHandle(newGliph);
-			}
+			log << "symb: " << symb << std::endl;
+			log << "count before del: " << m_pDoc->m_GliphList.GetCount() << std::endl;
+			m_pDoc->delGliphAt(symb);
+			log << "count after del: " << m_pDoc->m_GliphList.GetCount() << std::endl;
+			m_pDoc->addGliph(newGliph); 
+			log << "count after add: " << m_pDoc->m_GliphList.GetCount() << std::endl;
+			
+			log.close();
+			
+			newGliph->setBoundingBox();
+			newGliph->CreateHandleList(newGliph->getSpt(), newGliph->getEpt(), type);
+			showHandle(newGliph);
 		}
 		else if (flag == 1) {
 			if (pCurGliph->getType() == 0) {
@@ -234,121 +202,18 @@ void MyController::OnMouseMove(UINT nFlags, CPoint point)
 		this->Xoffset = offset.x;
 		this->Yoffset = offset.y;
 
-		std::ofstream log;
-		log.open("log.txt", std::ofstream::out | std::ofstream::app);
-		log << "flag: " << flag << std::endl;
-		log.close();
-
 		if (this->flag == 0)//move要擦除两次，一次是擦除已经建立好的图元，第二次是擦除移动过程中创建的图元
 		{
-			if (pCurGliph->getType() == 0)//线
-			{
-				//擦除原本的图形
-				m_pDC->MoveTo(pCurGliph->getSpt());
-				m_pDC->LineTo(pCurGliph->getEpt());
-				
-				//绘制新图形
-				m_pDC->MoveTo(pCurGliph->getSpt() + this->offset);
-				m_pDC->LineTo(pCurGliph->getEpt() + this->offset);
-				
-				//擦掉过程中的图像
-				m_pDC->MoveTo(pCurGliph->getSpt() + this->prevoffset);
-				m_pDC->LineTo(pCurGliph->getEpt() + this->prevoffset);
-				mousepointP = point;
-				this->prevoffset = mousepointP - mousepointS;
-				
-				/*//绘制新图像
-				m_pDC->MoveTo(pCurGliph->getSpt() + this->offset);
-				m_pDC->LineTo(pCurGliph->getEpt() + this->offset);
+			int type = pCurGliph->getType();
+			//擦掉过程中的图像
+			prevGliph = new Gliph(type, pCurGliph->getSpt() + this->prevoffset, pCurGliph->getEpt() + this->prevoffset);
+			prevGliph->drawSelf(m_pDC);
+			//绘制新图形
+			newGliph = new Gliph(type, pCurGliph->getSpt() + this->offset, pCurGliph->getEpt() + this->offset);
+			newGliph->drawSelf(m_pDC);
 
-				m_pDC->MoveTo(pCurGliph->getSpt() + this->offset);
-				m_pDC->LineTo(pCurGliph->getEpt() + this->offset);*/
-			}
-
-			if (pCurGliph->getType() == 1)//矩形
-			{
-				
-
-				//擦除原来的
-				m_pDC->Rectangle(CRect(pCurGliph->getSpt(), pCurGliph->getEpt()));
-				//绘制新的图形
-				m_pDC->Rectangle(CRect(pCurGliph->getSpt() + this->prevoffset, pCurGliph->getEpt() + this->prevoffset));
-
-				//擦掉过程中的
-				m_pDC->Rectangle(CRect(pCurGliph->getSpt() + this->prevoffset, pCurGliph->getEpt() + this->prevoffset));
-				mousepointP = point;
-				this->prevoffset = mousepointP - mousepointS;
-				//绘制新的图形
-				m_pDC->Rectangle(CRect(pCurGliph->getSpt() + this->prevoffset, pCurGliph->getEpt() + this->prevoffset));
-				m_pDC->Rectangle(CRect(pCurGliph->getSpt() + this->prevoffset, pCurGliph->getEpt() + this->prevoffset));
-				////在原来链表位置处设置新图像,以及显示出handle
-				newGliph = new Gliph(1, pCurGliph->getSpt() + this->offset, pCurGliph->getEpt() + this->offset);
-				m_pDoc->delGliphAt(symb);
-				//m_pDoc->upadateGliph(pCurGliph, newGliph);
-				m_pDoc->addGliph(newGliph);
-
-				newGliph->setBoundingBox();
-				//showBoundingBox(newGliph);
-				newGliph->CreateHandleList(newGliph->getSpt(), newGliph->getEpt(), 1);
-				showHandle(newGliph);
-				showHandle(newGliph);
-
-
-			}
-			if (pCurGliph->getType() == 2)//圆角
-			{
-		
-				//擦除原来的
-				m_pDC->RoundRect(CRect(pCurGliph->getSpt(), pCurGliph->getEpt()), CPoint(30, 30));
-				//绘制新的图形
-				m_pDC->RoundRect(CRect(pCurGliph->getSpt() + this->offset, pCurGliph->getEpt() + this->offset), CPoint(30, 30));
-				//擦掉过程中的
-				m_pDC->RoundRect(CRect(pCurGliph->getSpt() + this->prevoffset, pCurGliph->getEpt() + this->prevoffset), CPoint(30, 30));
-				mousepointP = point;
-				this->prevoffset = mousepointP - mousepointS;
-				//绘制新的图形
-				m_pDC->Rectangle(CRect(pCurGliph->getSpt() + this->prevoffset, pCurGliph->getEpt() + this->prevoffset));
-				m_pDC->Rectangle(CRect(pCurGliph->getSpt() + this->prevoffset, pCurGliph->getEpt() + this->prevoffset));
-				////在原来链表位置处设置新图像,以及显示出handle
-				newGliph = new Gliph(2, pCurGliph->getSpt() + this->offset, pCurGliph->getEpt() + this->offset);
-				m_pDoc->delGliphAt(symb);
-				//m_pDoc->upadateGliph(pCurGliph, newGliph);
-				m_pDoc->addGliph(newGliph);
-				
-				newGliph->setBoundingBox();
-				//showBoundingBox(newGliph);
-				newGliph->CreateHandleList(newGliph->getSpt(), newGliph->getEpt(), 2);
-				showHandle(newGliph);
-				showHandle(newGliph);
-
-			}  
-			if (pCurGliph->getType() == 3)//椭圆
-			{
-				//擦除原来的
-				m_pDC->Ellipse(CRect(pCurGliph->getSpt(), pCurGliph->getEpt()));
-				//绘制新的图形
-				m_pDC->Ellipse(CRect(pCurGliph->getSpt() + this->offset, pCurGliph->getEpt() + this->offset));
-				//擦掉过程中的
-				m_pDC->Ellipse(CRect(pCurGliph->getSpt() + this->offset, pCurGliph->getEpt() + this->offset));
-				mousepointP = point;
-				this->prevoffset = mousepointP - mousepointS;
-				//绘制新的图形
-				m_pDC->Ellipse(CRect(pCurGliph->getSpt() + this->offset, pCurGliph->getEpt() + this->offset));
-				m_pDC->Ellipse(CRect(pCurGliph->getSpt() + this->offset, pCurGliph->getEpt() + this->offset));
-				////在原来链表位置处设置新图像,以及显示出handle
-				newGliph = new Gliph(3, pCurGliph->getSpt() + this->offset, pCurGliph->getEpt() + this->offset);
-				m_pDoc->delGliphAt(symb);
-				//m_pDoc->upadateGliph(pCurGliph, newGliph);
-				m_pDoc->addGliph(newGliph);
-				
-				newGliph->setBoundingBox();
-				//showBoundingBox(newGliph);
-				newGliph->CreateHandleList(newGliph->getSpt(), newGliph->getEpt(), 3);
-				showHandle(newGliph);
-				showHandle(newGliph);
-
-
-			}
+			mousepointP = point;
+			this->prevoffset = mousepointP - mousepointS;
 		}
 		if (this->flag == 1)
 		{
