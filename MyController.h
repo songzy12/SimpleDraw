@@ -39,9 +39,10 @@ protected:
 	int i;
 	int Xoffset = mousepointE.x - mousepointS.x;
 	int Yoffset = mousepointE.y - mousepointS.y;
-	CPoint offset,prevoffset; // = mousepointE-mousepointS;???这样的offset不会更新？？
+	CPoint offset, prevoffset; // = mousepointE-mousepointS;???这样的offset不会更新？？
+	CPoint prevOffset1, prevOffset2;
 	STATE m_mode;
-	int a;
+	int handle;
 public:
 	void setDC(CDC * pDC){m_pDC = pDC;}
 	CDC * getDC(){return m_pDC;}

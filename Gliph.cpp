@@ -69,18 +69,18 @@ void Gliph::setSelectedFlag(bool flag)
 	if (type == 0)
 	{
 		handlelist[0] = new CRect(pt1.x - 5, pt1.y - 5, pt1.x + 5, pt1.y + 5);
-		handlelist[1] = new CRect(pt2.x - 5, pt2.y - 5, pt2.x + 5, pt2.y + 5);
+		handlelist[2] = new CRect(pt2.x - 5, pt2.y - 5, pt2.x + 5, pt2.y + 5);
 	}
 	else
 	{
-		handlelist[0] = new CRect(pt1.x - 5, pt1.y + 5, pt1.x + 5, pt1.y - 5);
-		handlelist[1] = new CRect(pt2.x - 5, pt1.y + 5, pt2.x + 5, pt1.y - 5);
-		handlelist[2] = new CRect(pt2.x - 5, pt2.y + 5, pt2.x + 5, pt2.y - 5);
-		handlelist[3] = new CRect(pt1.x - 5, pt2.y + 5, pt1.x + 5, pt2.y - 5);
-		handlelist[4] = new CRect(middleX - 5, pt1.y + 5, middleX + 5, pt1.y - 5);
-		handlelist[5] = new CRect(pt2.x - 5, middleY + 5, pt2.x + 5, middleY - 5);
-		handlelist[6] = new CRect(middleX - 5, pt2.y + 5, middleX + 5, pt2.y - 5);
-		handlelist[7] = new CRect(pt1.x - 5, middleY + 5, pt1.x + 5, middleY - 5);
+		handlelist[0] = new CRect(pt1.x - 5, pt1.y - 5, pt1.x + 5, pt1.y + 5); // 左上
+		handlelist[1] = new CRect(pt2.x - 5, pt1.y - 5, pt2.x + 5, pt1.y + 5); // 右上
+		handlelist[2] = new CRect(pt2.x - 5, pt2.y - 5, pt2.x + 5, pt2.y + 5); // 右下
+		handlelist[3] = new CRect(pt1.x - 5, pt2.y - 5, pt1.x + 5, pt2.y + 5); // 左下
+		handlelist[4] = new CRect(middleX - 5, pt1.y - 5, middleX + 5, pt1.y + 5); // 上
+		handlelist[5] = new CRect(pt2.x - 5, middleY - 5, pt2.x + 5, middleY + 5); // 右
+		handlelist[6] = new CRect(middleX - 5, pt2.y - 5, middleX + 5, pt2.y + 5); // 下
+		handlelist[7] = new CRect(pt1.x - 5, middleY - 5, pt1.x + 5, middleY + 5); // 左
 	}
 	int i;
 	for (i = 0; i < 8; i++)
