@@ -43,7 +43,7 @@ END_MESSAGE_MAP()
 CSimpleDrawView::CSimpleDrawView()
 {
 	// TODO: 在此处添加构造代码
-//	m_mode = this->DRAW_SELECT;
+//	mMode = this->DRAW_SELECT;
 }
 
 CSimpleDrawView::~CSimpleDrawView()
@@ -173,42 +173,42 @@ void CSimpleDrawView::OnUpdateDrawLine(CCmdUI *pCmdUI)
 void CSimpleDrawView::OnDrawRectangle()
 {
 	// TODO: 在此添加命令处理程序代码
-	this->m_controller.setOpMode(MyController::DRAW_Rectangle);
+	this->m_controller.setOpMode(MyController::DRAW_RECTANGLE);
 }
 
 
 void CSimpleDrawView::OnUpdateDrawRectangle(CCmdUI *pCmdUI)
 {
 	// TODO: 在此添加命令更新用户界面处理程序代码
-	pCmdUI->SetCheck(m_controller.getOpMode() == MyController::DRAW_Rectangle);
+	pCmdUI->SetCheck(m_controller.getOpMode() == MyController::DRAW_RECTANGLE);
 }
 
 
 void CSimpleDrawView::OnDrawEllipse()
 {
 	// TODO: 在此添加命令处理程序代码
-	this->m_controller.setOpMode(MyController::DRAW_Ellipse);
+	this->m_controller.setOpMode(MyController::DRAW_ELLIPSE);
 }
 
 
 void CSimpleDrawView::OnUpdateDrawEllipse(CCmdUI *pCmdUI)
 {
 	// TODO: 在此添加命令更新用户界面处理程序代码
-	pCmdUI->SetCheck(m_controller.getOpMode() == MyController::DRAW_Ellipse);
+	pCmdUI->SetCheck(m_controller.getOpMode() == MyController::DRAW_ELLIPSE);
 }
 
 
 void CSimpleDrawView::OnDrawRoundrect()
 {
 	// TODO: 在此添加命令处理程序代码
-	this->m_controller.setOpMode(MyController::DRAW_RoundRect);
+	this->m_controller.setOpMode(MyController::DRAW_ROUNDRECT);
 }
 
 
 void CSimpleDrawView::OnUpdateDrawRoundrect(CCmdUI *pCmdUI)
 {
 	// TODO: 在此添加命令更新用户界面处理程序代码
-	pCmdUI->SetCheck(m_controller.getOpMode() == MyController::DRAW_RoundRect);
+	pCmdUI->SetCheck(m_controller.getOpMode() == MyController::DRAW_ROUNDRECT);
 }
 
 

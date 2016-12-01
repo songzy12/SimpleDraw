@@ -12,9 +12,9 @@ public:
 public:
 	enum STATE{		        
 		DRAW_LINE,
-		DRAW_Rectangle,
-		DRAW_RoundRect,
-		DRAW_Ellipse,
+		DRAW_RECTANGLE,
+		DRAW_ROUNDRECT,
+		DRAW_ELLIPSE,
 		DRAW_SELECT
 	};
 
@@ -24,37 +24,32 @@ protected:
 	CSimpleDrawDoc* m_pDoc;
 	
 	Gliph* pCurGliph;
-	Gliph* prevGliph;
-	Gliph* newGliph;
-	CPoint m_ptStart,m_ptPrev,m_ptEnd;
-	CPoint mousepointS, mousepointP, mousepointE;//用于select模式下记录鼠标坐标的
+	Gliph* pPrevGliph;
+	Gliph* pNewGliph;
+
+	CPoint mousePtS;//用于select模式下记录鼠标坐标的
 	int flag;//用于判断是移动(0)还是均匀缩放(1)还是非均匀缩放(2),
-	int symb;//用于记录Glif数组当前选中的gliph的index
-	int x1 = m_ptStart.x;
-	int y1 = m_ptStart.y;
-	int x2 = m_ptEnd.x;
-	int y2 = m_ptEnd.y;
-	int x3 = m_ptPrev.x;
-	int y3 = m_ptPrev.x;
-	int i;
-	int Xoffset = mousepointE.x - mousepointS.x;
-	int Yoffset = mousepointE.y - mousepointS.y;
-	CPoint offset, prevoffset; // = mousepointE-mousepointS;???这样的offset不会更新？？
+	int symb;//用于记录Glif数组当前选中的gliph的index	
+
+	CPoint prevOffset;
 	CPoint prevOffset1, prevOffset2;
-	STATE m_mode;
-	int handle;
+
+	STATE mMode;
+	int mHandle;
+
 public:
 	void setDC(CDC * pDC){m_pDC = pDC;}
 	CDC * getDC(){return m_pDC;}
 	void setpDoc(CSimpleDrawDoc* pDoc) { m_pDoc = pDoc; }
-	void setOpMode(STATE state){m_mode = state;}
-	STATE getOpMode(){return m_mode;}
+	void setOpMode(STATE state){mMode = state;}
+	STATE getOpMode(){return mMode;}
 
 public:
 	void OnLButtonDown(UINT nFlags, CPoint point);
 	void OnLButtonUp(UINT nFlags, CPoint point);
 	void OnMouseMove(UINT nFlags, CPoint point);
-	void showSelf(Gliph* ptGliph);
+	
+    void showSelf(Gliph* ptGliph);
 	void showHandle(Gliph* ptGliph);
 	void hideHandle(Gliph* ptGliph);
 	void showBoundingBox(Gliph* ptGliph);
