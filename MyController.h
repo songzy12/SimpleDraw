@@ -27,10 +27,10 @@ protected:
 	Gliph* pPrevGliph;
 	Gliph* pNewGliph;
 
-	CPoint mousePtS;//用于select模式下记录鼠标坐标的
 	int flag;//用于判断是移动(0)还是均匀缩放(1)还是非均匀缩放(2),
 	int symb;//用于记录Glif数组当前选中的gliph的index	
 
+    CPoint prevMousePt;//用于select模式下记录鼠标坐标的
 	CPoint prevOffset;
 	CPoint prevOffset1, prevOffset2;
 

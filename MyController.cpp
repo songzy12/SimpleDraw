@@ -51,12 +51,12 @@ void MyController::hideBoundingBox(Gliph* ptGliph) {
 
 void MyController::OnLButtonDown(UINT nFlags, CPoint point)
 {
-	mousePtS = point;
+	prevMousePt = point;
 	
 	if (mMode != MyController::DRAW_SELECT)
 	{
         Gliph::TYPE type = static_cast<Gliph::TYPE> (mMode);
-		pCurGliph = new Gliph(type, mousePtS, point);
+		pCurGliph = new Gliph(type, prevMousePt, point);
 		m_pDoc->addGliph(pCurGliph);
 		showHandle(pCurGliph);
 	}
@@ -64,7 +64,7 @@ void MyController::OnLButtonDown(UINT nFlags, CPoint point)
 	{
 		if (flag != -1)
 			return;
-		mousePtS = point;
+		prevMousePt = point;
 
 		int count = m_pDoc->m_GliphList.GetCount();
 		
@@ -93,7 +93,7 @@ void MyController::OnLButtonUp(UINT nFlags, CPoint point)
 {	
 	if (mMode != DRAW_SELECT)
 	{
-		pCurGliph->setCorner(mousePtS, point);
+		pCurGliph->setCorner(prevMousePt, point);
 		showHandle(pCurGliph);
 	}
 	else
@@ -126,7 +126,7 @@ void MyController::OnMouseMove(UINT nFlags, CPoint point)
 			showSelf(pCurGliph);
 			hideHandle(pCurGliph);
 			
-			pCurGliph->setCorner(mousePtS, point);
+			pCurGliph->setCorner(prevMousePt, point);
 
 			showSelf(pCurGliph);
 			showHandle(pCurGliph);
@@ -137,7 +137,7 @@ void MyController::OnMouseMove(UINT nFlags, CPoint point)
         if (flag == -1)
             return;
 		
-		CPoint offset = point - mousePtS;//更新offset		
+		CPoint offset = point - prevMousePt;//更新offset		
 
         Gliph::TYPE type = pCurGliph->getType();
 
