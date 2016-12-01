@@ -155,42 +155,18 @@ void MyController::OnMouseMove(UINT nFlags, CPoint point)
 		else if (flag == 1)
 		{
 			CPoint offset1, offset2;
-            int xOffset = offset.x;
-            int yOffset = offset.y;
 			
 			// 0: 左上, 1: 右上, 2: 右下, 3: 左下
 			// 4: 上, 5: 右, 6: 下, 7: 左
 
-			if (mHandle == 0 || mHandle == 4 || mHandle == 7)
-			{
-				offset1.x = xOffset;
-				offset1.y = yOffset;
-				offset2.x = 0;
-				offset2.y = 0;
-			}
-			if (mHandle == 1)
-			{
-				offset1.x = 0;
-				offset1.y = yOffset;
-				offset2.x = xOffset;
-				offset2.y = 0;
-
-			}
-			if (mHandle == 3)
-			{
-				offset1.y = 0;
-				offset1.x = xOffset;
-				offset2.y = yOffset;
-				offset2.x = 0;
-
-			}
-			if (mHandle == 2 || mHandle == 5 || mHandle == 6)
-			{
-				offset2.x = xOffset;
-				offset2.y = yOffset;
-				offset1.x = 0;
-				offset1.y = 0;
-			}
+            bool offset1x = (mHandle == 0 || mHandle == 3 || mHandle == 7);
+            bool offset1y = (mHandle == 0 || mHandle == 1 || mHandle == 4);
+            bool offset2x = (mHandle == 1 || mHandle == 2 || mHandle == 5);
+            bool offset2y = (mHandle == 2 || mHandle == 3 || mHandle == 6);
+            offset1.x = offset1x ? offset.x : 0;
+            offset1.y = offset1y ? offset.y : 0;
+            offset2.x = offset2x ? offset.x : 0;
+            offset2.y = offset2y ? offset.y : 0;
 
 			//擦掉过程中的图像
 			pPrevGliph = new Gliph(type, pCurGliph->getSpt() + prevOffset1, pCurGliph->getEpt() + prevOffset2);
