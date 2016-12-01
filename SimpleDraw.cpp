@@ -139,4 +139,3 @@ void CSimpleDrawApp::OnAppAbout()
 
 
 // CSimpleDrawApp 消息处理程序
-

@@ -80,14 +80,14 @@ bool  CSimpleDrawDoc::addGliph(Gliph * Obj)
 	this->m_GliphList.AddTail(Obj);
 	return true;
 }
-Gliph * CSimpleDrawDoc::getGliphAt(unsigned int index)
+Gliph * CSimpleDrawDoc::getGliphAt(int index)
 {
 	if (index < 0 || index >= this->m_GliphList.GetCount()) {
 		return NULL;
 	}
 	return this->m_GliphList.GetAt(m_GliphList.FindIndex(index));
 }
-bool CSimpleDrawDoc::delGliphAt(unsigned int index)
+bool CSimpleDrawDoc::delGliphAt(int index)
 {
 	if (index < 0 || index >= this->m_GliphList.GetCount()) {
 		return NULL;

@@ -2,49 +2,43 @@
 class Gliph
 {
 public:
+    enum TYPE
+    {
+        LINE,
+        RECTANGLE,
+        ROUNDRECT,
+        ELLIPSE,
+        SELECT
+    };
 
-	
-	Gliph(int type, CPoint point1, CPoint point2);
-	~Gliph();
-	//Gliph(CPoint point1, CPoint point2);
-	
-
-	CRect handleList[8];
-	CRect m_BoundingBox;//CRect是类，Rectangle是函数
-	
-
+    Gliph(TYPE type, CPoint pt1, CPoint pt2);
+    ~Gliph();
 
 protected:
-	int m_type;//在子类里面分别定义值，line=0，rect=1,roundrect=2,ellipse=3,select=4
-	CPoint start;
-	CPoint end;
+	TYPE mType;//在子类里面分别定义值，line=0，rect=1,roundrect=2,ellipse=3,select=4
+	CPoint mTopLeftPt;
+	CPoint mBottomRightPt;
+    bool mSelectedFlag;
 
-	
-	CRect m_HandleBox;
-	CRect handle;
-	unsigned char m_cWidth;
-	COLORREF m_color;
-	bool m_bSelectedFlag;
-	bool m_bSHandleFlag;
-
-
-
+    CRect mHandleList[8];
+    CRect mBoundingBox;//CRect是类，Rectangle是函数
 
 public:
-	bool hitTest(CPoint pt);
-	int hitHandleTest(CPoint pt);//返回击中的是哪一个
-	void moveByOffset(float Xoffset, float yOffset);
-	void moveTo(unsigned int index, CPoint pt);
-	bool getSelectedFlag();
-	void setSelectedFlag(bool flag);
+	BOOL isSelected(CPoint pt);
+	int handleSelected(CPoint pt);//返回击中的是哪一个
+	
+    void drawSelf(CDC* pDC);
+	void drawBoundingBox(CDC* pdc);
+    void drawHandle(CDC* pdc);
 
-	void setBoundingBox();
-	void CreateHandleList(CPoint pt1, CPoint pt2, int type);
-	void drawSelf(CDC* pDC);
-	void Drawboundingbox(CDC* pdc);
-	void addpoint(CPoint point);
-	int getType() { return this->m_type; }
-	CPoint getSpt() { return start; }
-	CPoint getEpt() { return end; }
+    void setCorner(CPoint pt1, CPoint pt2);
+    void setSelectedFlag(bool flag);
+    void setBoundingBox();
+    void setHandleList();
+
+    bool getSelectedFlag() { return mSelectedFlag; }
+    TYPE getType() { return mType; }	
+    CPoint getSpt() { return mTopLeftPt; }
+	CPoint getEpt() { return mBottomRightPt; }
 };
 

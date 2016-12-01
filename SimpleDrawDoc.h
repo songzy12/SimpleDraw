@@ -22,8 +22,8 @@ public:
 	virtual void Serialize(CArchive& ar);
 public:
 	bool      addGliph(Gliph * Obj);//增加一个stroke
-	Gliph* getGliphAt(unsigned int index);//得到一个stroke指针
-	bool      delGliphAt(unsigned int index);//删除一个stroke
+    Gliph*    getGliphAt(int index);//得到一个stroke指针
+	bool      delGliphAt(int index);//删除一个stroke
 	bool      delGliph(Gliph* Obj);//删除一个stroke
 	unsigned int GliphCount();//stroke的个数
 	void      clear();//清空当前文档

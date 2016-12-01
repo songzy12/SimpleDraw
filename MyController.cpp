@@ -9,6 +9,7 @@ MyController::MyController(void)
 	symb = -1;
 	newGliph = nullptr;
 }
+
 MyController::MyController(CDC * pDC, CSimpleDrawDoc* pDoc)
 {
 	this->m_pDC = pDC;
@@ -17,6 +18,7 @@ MyController::MyController(CDC * pDC, CSimpleDrawDoc* pDoc)
 	symb = -1;
 	newGliph = nullptr;
 }
+
 MyController::~MyController(void)
 {
 }
@@ -28,11 +30,7 @@ void MyController::showSelf(Gliph* ptGliph)
 
 void MyController::showHandle(Gliph* ptgliph)
 {
-	int symb;
-	for (symb = 0; symb < 8; symb++)
-	{
-		this->m_pDC->Rectangle(ptgliph->handleList[symb]);
-	}
+    ptgliph->drawHandle(m_pDC);
 }
 
 void MyController::hideHandle(Gliph* ptgliph) {
@@ -43,7 +41,7 @@ void MyController::hideHandle(Gliph* ptgliph) {
 
 void MyController::showBoundingBox(Gliph* ptGliph)
 {
-	this->m_pDC->Rectangle(ptGliph->m_BoundingBox);
+    ptGliph->drawBoundingBox(m_pDC);
 }
 
 void MyController::hideBoundingBox(Gliph* ptGliph) {
@@ -54,22 +52,23 @@ void MyController::hideBoundingBox(Gliph* ptGliph) {
 
 void MyController::OnLButtonDown(UINT nFlags, CPoint point)
 {
-	this->m_ptStart = point;
-	this->m_ptPrev = point;
+	m_ptStart = point;
+	m_ptPrev = point;
 	
 	if (m_mode != MyController::DRAW_SELECT)
 	{
-		pCurGliph = new Gliph(m_mode, point, point);
+        Gliph::TYPE type = static_cast<Gliph::TYPE> (m_mode);
+		pCurGliph = new Gliph(type, point, point);
 		m_pDoc->addGliph(pCurGliph);
 
-		pCurGliph->addpoint(point);
+		pCurGliph->setCorner(m_ptStart, point);
 		pCurGliph->setBoundingBox();
-		pCurGliph->CreateHandleList(this->m_ptStart, point, m_mode);
+		pCurGliph->setHandleList();
 		showHandle(pCurGliph);
 	}
 	else
 	{
-		if (this->flag != -1)
+		if (flag != -1)
 			return;
 		mousepointS = point;
 		mousepointP = point;
@@ -85,24 +84,24 @@ void MyController::OnLButtonDown(UINT nFlags, CPoint point)
 		{
 			pCurGliph = m_pDoc->getGliphAt(i);
 			
-			if (pCurGliph->hitHandleTest(point) != -1)
+			if (pCurGliph->handleSelected(point) != -1)
 			{
-				handle = pCurGliph->hitHandleTest(point);
+				handle = pCurGliph->handleSelected(point);
 
 				std::ofstream log;
 				log.open("log.txt", std::ofstream::out | std::ofstream::app);
 				log << "handle hit: " << handle << std::endl;
 				log.close();
 
-				this->flag = 1;//缩放
-				this->symb = i;
+				flag = 1;//缩放
+				symb = i;
 				break;
 			}
-			else if (m_pDoc->getGliphAt(i)->hitTest(point))
+			else if (m_pDoc->getGliphAt(i)->isSelected(point))
 			{
-				this->flag = 0;//移动		
+				flag = 0;//移动		
 				//this->showBoundingBox(pCurGliph); //击中就显示boundingbox
-				this->symb = i;
+				symb = i;
 				break;
 			}
 		}
@@ -111,13 +110,13 @@ void MyController::OnLButtonDown(UINT nFlags, CPoint point)
 
 void MyController::OnLButtonUp(UINT nFlags, CPoint point)
 {
-	this->m_ptEnd = point;
+	m_ptEnd = point;
 	
 	if (m_mode != DRAW_SELECT)
 	{
-		pCurGliph->addpoint(point);
+		pCurGliph->setCorner(m_ptStart, point);
 		pCurGliph->setBoundingBox();
-		pCurGliph->CreateHandleList(this->m_ptStart, point, m_mode);
+		pCurGliph->setHandleList();
 		showHandle(pCurGliph);
 	}
 	else
@@ -155,7 +154,7 @@ void MyController::OnLButtonUp(UINT nFlags, CPoint point)
 		//log.close();
 			
 		newGliph->setBoundingBox();
-		newGliph->CreateHandleList(newGliph->getSpt(), newGliph->getEpt(), type);
+		newGliph->setHandleList();
 		showHandle(newGliph);
 		
 		/*newGliph = nullptr; */
@@ -172,12 +171,12 @@ void MyController::OnMouseMove(UINT nFlags, CPoint point)
 			showSelf(pCurGliph);
 			hideHandle(pCurGliph);
 			
-			pCurGliph->addpoint(point);
+			pCurGliph->setCorner(m_ptStart, point);
 			showSelf(pCurGliph);
 			showHandle(pCurGliph);
 
 			pCurGliph->setBoundingBox();
-			pCurGliph->CreateHandleList(this->m_ptStart, point, 1);
+			pCurGliph->setHandleList();
 		}
 	}
 	else
@@ -188,10 +187,13 @@ void MyController::OnMouseMove(UINT nFlags, CPoint point)
 		this->offset = mousepointE - mousepointS;//更新offset		
 		this->Xoffset = offset.x;
 		this->Yoffset = offset.y;
+        if (flag == -1)
+            return;
+
+        Gliph::TYPE type = pCurGliph->getType();
 
 		if (this->flag == 0)//move要擦除两次，一次是擦除已经建立好的图元，第二次是擦除移动过程中创建的图元
 		{
-			int type = pCurGliph->getType();
 			//擦掉过程中的图像
 			prevGliph = new Gliph(type, pCurGliph->getSpt() + this->prevoffset, pCurGliph->getEpt() + this->prevoffset);
 			prevGliph->drawSelf(m_pDC);
@@ -205,8 +207,6 @@ void MyController::OnMouseMove(UINT nFlags, CPoint point)
 		if (this->flag == 1)
 		{
 			CPoint offset1, offset2; 
-
-			int type = pCurGliph->getType();
 			
 			// 0: 左上, 1: 右上, 2: 右下, 3: 左下
 			// 4: 上, 5: 右, 6: 下, 7: 左
